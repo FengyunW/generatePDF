@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./jspdf.min.js"></script>
+    <script src="./jquery-3.4.1.min.js"></script>
+</head>
+
+<body>
+    <div>
+        demo
+    </div>
+    <script>
+        $().ready(function () {
+            // 1. generate pdf object
+            let doc = new jsPDF();
+            let elementHandler = {
+                '#ignorePDF': function (element, renderer) {
+                    return true;
+                }
+            };
+            let source = window.document.getElementsByTagName("body")[0];
+            doc.fromHTML(
+                source,
+                15,
+                15,
+                {
+                    'width': 180, 'elementHandlers': elementHandler
+                });
+            let pdfObj = doc.output('datauri')
+            console.log(pdfObj)
+
+            let data = new FormData();
+            data.append('filename', 'a4.pdf');
+            data.append('data', pdfObj);
+
+            // 2. send to server
+            // jquery or promise
+            postData(data).done(function (data) {
+                console.log('jquery promise done')
+            }).fail(function (xhr) {
+                console.log('jquery promise fail')
+
+                console.log(xhr.statusText)
+            }).always(function () {
+                console.log('jquery promise always')
+            })
+        });
+
+        function postData(data) {
+            return $.ajax({
+                url: 'http://localhost/',
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: data
+            })
+        }
+    </script>
+</body>
+
+</html>
